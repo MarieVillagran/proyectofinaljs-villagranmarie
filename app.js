@@ -1,69 +1,4 @@
-const stockProductos = [
-  {
-    id: 1,
-    nombre: "Jamon y Queso",
-    cantidad: 1,
-    desc: "Jamón y Mozzarella la perfecta combinación, para lograr la humedad justa esta la ricota",
-    precio: 950,
-    img: "https://res.cloudinary.com/marievillagran/image/upload/v1661698208/Proyecto/clasico2_hjh2ji.jpg",
-  },
-  {
-    id: 2,
-    nombre: "Jamon y Queso con nuez",
-    cantidad: 1,
-    desc: "Jamón y Mozzarella, sumado a las nueces con su textura y sabor inigualable",
-    precio: 950,
-    img: "https://res.cloudinary.com/marievillagran/image/upload/v1661698208/Proyecto/clasico2_hjh2ji.jpg",
-  },
-  {
-    id: 3,
-    nombre: "Ternera",
-    cantidad: 1,
-    desc: "La ternera combinada con mozzarella logran una revolución en tu paladar",
-    precio: 1100,
-    img: "https://res.cloudinary.com/marievillagran/image/upload/v1661698207/Proyecto/ternera2_pel2ai.jpg",
-  },
-  {
-    id: 4,
-    nombre: "Verdura",
-    cantidad: 1,
-    desc: "Con verduras nobles como la espinaca, un toque de cebolla y morron rojo. Sumamos la ricota",
-    precio: 900,
-    img: "https://res.cloudinary.com/marievillagran/image/upload/v1661698208/Proyecto/verdura2_kgilih.jpg",
-  },
-  {
-    id: 5,
-    nombre: "Calabaza",
-    cantidad: 1,
-    desc: "La calabaza asada logra una textura y la dulzura adecuada, coronado con mozzarella",
-    precio: 900,
-    img: "https://res.cloudinary.com/marievillagran/image/upload/v1661698207/Proyecto/calabaza2_qcnoe9.jpg",
-  },
-  {
-    id: 6,
-    nombre: "Gourmet",
-    cantidad: 1,
-    desc: "El brasilero a las finas hierbas y el queso crema forman un relleno novedoso y perfecto",
-    precio: 950,
-    img: "https://res.cloudinary.com/marievillagran/image/upload/v1661698207/Proyecto/gourmet2_oy3bfh.jpg",
-  },
-  {
-    id: 7,
-    nombre: "Promo 1",
-    cantidad: 1,
-    desc: "Siempre lista: 3 docenas de sorrentinos(incluye una de Ternera). Podes combinarlas",
-    precio: 2700,
-    img: "https://res.cloudinary.com/marievillagran/image/upload/v1672102399/Proyecto/promo2_ytlywl.jpg",
-  },
-  {
-    id: 8,
-    nombre: "Promo 2",
-    cantidad: 1,
-    desc: "Con amigos y familia: 8 docenas de sorrentinos(incluye 3 de Ternera). Podes combinarlas",
-    precio: 6000,
-    img: "https://res.cloudinary.com/marievillagran/image/upload/v1672102399/Proyecto/promo1_ncpygf.jpg",
-  },
-];
+
 let carrito = [];
 
 
@@ -84,6 +19,42 @@ if (activarFuncion) {
   activarFuncion.addEventListener('click', procesarPedido)
 }
 
+const mostrarCarrito = () => {
+  const modalBody = document.querySelector(".modal .modal-body")
+  if (modalBody) {
+    modalBody.innerHTML = ''
+    carrito.forEach((prod) => {
+      const { id, nombre, precio, desc, img, cantidad } = prod
+      modalBody.innerHTML += `
+        <div class="modal-contenedor">
+          <div>
+          <img class="img-fluid img-carrito" src="${img}"/>
+          </div>
+          <div>
+          <p>Producto: ${nombre}</p>
+          <p>Precio: ${precio}</p>
+          <p>Cantidad :${cantidad}</p>
+
+          <button onclick="eliminarProducto(${id})" class="btn btn-danger">Eliminar producto</button>
+          </div>
+        </div>    
+        `
+    })
+  }
+
+  if (carrito.length === 0) {
+    modalBody.innerHTML = `
+      <p class= "text-center text-primary parrafo">¡Debes agregar producots al carrito!</p> 
+      `
+  }
+
+  carritoContenedor.textContent = carrito.length
+
+  if (precioTotal) {
+    precioTotal.textContent = carrito.reduce((acc, prod) => acc + prod.cantidad * prod.precio, 0)
+  }
+  guardarStorage()
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   carrito = JSON.parse(localStorage.getItem('carrito')) || []
@@ -93,9 +64,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })
 
+let stockProductos 
+fetch("./data.json")
+.then(response => {
+  return response.json()
+})
+.then(data  => {
+  console.log(data)
+  stockProductos = data
+})
+
+console.log(stockProductos);
+
+const stock = stockProductos
 
 
-stockProductos.forEach((prod) => {
+
+/* stock.forEach((prod) => {
+  console.log(prod)
   const { id, nombre, precio, desc, img, cantidad } = prod
   if (contenedor) {
     contenedor.innerHTML += `
@@ -113,7 +99,9 @@ stockProductos.forEach((prod) => {
     </div>
       `
   }
-})
+}) */
+
+
 
 if (procesarCompra) {
   procesarCompra.addEventListener('click', () => {
@@ -153,42 +141,7 @@ function agregarProducto(id) {
   mostrarCarrito()
 }
 
-const mostrarCarrito = () => {
-  const modalBody = document.querySelector(".modal .modal-body")
-  if (modalBody) {
-    modalBody.innerHTML = ''
-    carrito.forEach((prod) => {
-      const { id, nombre, precio, desc, img, cantidad } = prod
-      modalBody.innerHTML += `
-        <div class="modal-contenedor">
-          <div>
-          <img class="img-fluid img-carrito" src="${img}"/>
-          </div>
-          <div>
-          <p>Producto: ${nombre}</p>
-          <p>Precio: ${precio}</p>
-          <p>Cantidad :${cantidad}</p>
 
-          <button onclick="eliminarProducto(${id})" class="btn btn-danger">Eliminar producto</button>
-          </div>
-        </div>    
-        `
-    })
-  }
-
-  if (carrito.length === 0) {
-    modalBody.innerHTML = `
-      <p class= "text-center text-primary parrafo">¡Debes agregar producots al carrito!</p> 
-      `
-  }
-
-  carritoContenedor.textContent = carrito.length
-
-  if (precioTotal) {
-    precioTotal.textContent = carrito.reduce((acc, prod) => acc + prod.cantidad * prod.precio, 0)
-  }
-  guardarStorage()
-}
 function eliminarProducto(id) {
   const sorrentinoId = id
   carrito = carrito.filter((sorrentino) => sorrentino.id !== sorrentinoId)//traemos los productos menos los que cumplan la condicion
@@ -274,11 +227,10 @@ function enviarPedido(e) {
 }
 
 //Se accede a la datos a traves de ruta relativa
-fetch('data.json')
+/* fetch('./data.json')
   .then((response) => response.json())
   .then((usuarios) => {
     let bodyList = document.getElementById("bodyUsers");
-    console.log(usuarios);
     usuarios.forEach(element => {
       let listItem = document.createElement("li");
       listItem.innerHTML = `
@@ -286,4 +238,4 @@ fetch('data.json')
                 `;
       bodyList.append(listItem)
     });
-  })
+  }) */
