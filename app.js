@@ -1,7 +1,3 @@
-
-let carrito = [];
-
-
 const contenedor = document.querySelector("#contenedor")
 const carritoContenedor = document.querySelector('#carritoContenedor')
 const vaciarCarrito = document.querySelector('#vaciarCarrito')
@@ -10,6 +6,8 @@ const procesarCompra = document.querySelector('#procesarCompra')
 const activarFuncion = document.querySelector('#activarFuncion')
 const totalProceso = document.querySelector('#totalProceso')
 const formulario = document.querySelector('#procesar-pago')
+
+let carrito = [];
 
 if (formulario) {
   formulario.addEventListener('submit', enviarPedido)
@@ -34,7 +32,6 @@ const mostrarCarrito = () => {
           <p>Producto: ${nombre}</p>
           <p>Precio: ${precio}</p>
           <p>Cantidad :${cantidad}</p>
-
           <button onclick="eliminarProducto(${id})" class="btn btn-danger">Eliminar producto</button>
           </div>
         </div>    
@@ -64,44 +61,36 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })
 
-let stockProductos 
-fetch("./data.json")
-.then(response => {
-  return response.json()
-})
-.then(data  => {
-  console.log(data)
-  stockProductos = data
-})
+const fetchData = async () => {
+  try {
+    const response = await fetch("data.json")
+    const data = await response.json()
+    stockProductos = data
+    stockProductos.forEach((prod) => {
+      const { id, nombre, precio, desc, img, cantidad } = prod
+      if (contenedor) {
+        contenedor.innerHTML += `
+          <div class="card shadow mb-1 bg-dark rounded" style="width: 18rem;">
+          <h5 class="card-title pt-2 text-center text-primary">${nombre}</h5>
+          <img class="card-img-top mt-2" src="${img}" alt="Card image cap">
+          <div class="card-body">
+            
+            <h5 class="card-text text-primary">Precio: ${precio}</h5>
+            <p class="card-text text-white-50 description"> ${desc}</p>
+            <p class="card-text">Cantidad: ${cantidad}</p>
 
-console.log(stockProductos);
-
-const stock = stockProductos
-
-
-
-/* stock.forEach((prod) => {
-  console.log(prod)
-  const { id, nombre, precio, desc, img, cantidad } = prod
-  if (contenedor) {
-    contenedor.innerHTML += `
-      <div class="card shadow mb-1 bg-dark rounded" style="width: 18rem;">
-      <h5 class="card-title pt-2 text-center text-primary">${nombre}</h5>
-      <img class="card-img-top mt-2" src="${img}" alt="Card image cap">
-      <div class="card-body">
-        
-        <h5 class="card-text text-primary">Precio: ${precio}</h5>
-        <p class="card-text text-white-50 description"> ${desc}</p>
-        <p class="card-text">Cantidad: ${cantidad}</p>
-
-        <button onclick="agregarProducto(${id})" class="btn btn-primary">Agregar al carrito</button>
-      </div>
-    </div>
-      `
+            <button onclick="agregarProducto(${id})" class="btn btn-primary">Agregar al carrito</button>
+          </div>
+        </div>
+          `
+      }
+    })
+  } catch (err) {
+    throw new Error(err)
   }
-}) */
+}
 
-
+fetchData();
 
 if (procesarCompra) {
   procesarCompra.addEventListener('click', () => {
@@ -147,13 +136,12 @@ function eliminarProducto(id) {
   carrito = carrito.filter((sorrentino) => sorrentino.id !== sorrentinoId)//traemos los productos menos los que cumplan la condicion
   mostrarCarrito()
 }
+
 function guardarStorage() {
   localStorage.setItem("carrito", JSON.stringify(carrito))
-
 }
 
 function procesarPedido() {
-
   carrito.forEach((prod) => {
     const listaCompra = document.querySelector('#lista-compra tbody')
     const { id, nombre, precio, cantidad, img } = prod
@@ -203,7 +191,6 @@ function enviarPedido(e) {
         alert(JSON.stringify(err));
       });
 
-
     const spinner = document.querySelector('#spinner')
     spinner.classList.add('d-flex')
     spinner.classList.remove('d-none')
@@ -225,17 +212,3 @@ function enviarPedido(e) {
     localStorage.clear()
   }
 }
-
-//Se accede a la datos a traves de ruta relativa
-/* fetch('./data.json')
-  .then((response) => response.json())
-  .then((usuarios) => {
-    let bodyList = document.getElementById("bodyUsers");
-    usuarios.forEach(element => {
-      let listItem = document.createElement("li");
-      listItem.innerHTML = `
-                <h4 class="text-center text-primary">${element.nombre}</h4>
-                `;
-      bodyList.append(listItem)
-    });
-  }) */
